@@ -18,6 +18,7 @@ const items = [
   { href: "/middleware-demo", label: "Middleware" },
   { href: "/images", label: "Image Optimization" },
   { href: "/env-vars", label: "Environment Variables" },
+  { href: "/ui-components", label: "UI Components Demo" },
   { href: "/dark-mode", label: "🌙 Dark Mode Demo" }
 ];
 
