@@ -3,8 +3,8 @@ import Sidebar from "@/components/Sidebar";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid grid-rows-[auto_1fr] md:grid-rows-[auto_1fr] md:grid-cols-[16rem_1fr] min-h-dvh">
-      <div className="md:col-span-2">
+    <div className="grid grid-rows-[auto_1fr] grid-cols-[16rem_1fr] min-h-dvh">
+      <div className="col-span-2">
         <Topbar />
       </div>
       <Sidebar />

@@ -1,6 +1,12 @@
+import { headers } from 'next/headers';
+
 export default async function APIDemoPage() {
-  const base = process.env.NEXT_PUBLIC_BASE_URL ?? "";
-  const res = await fetch(`${base}/api/time`, { cache: "no-store" });
+  const headersList = await headers();
+  const host = headersList.get('host') || 'localhost:3000';
+  const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? `${protocol}://${host}`;
+  
+  const res = await fetch(`${baseUrl}/api/time`, { cache: "no-store" });
   const data = await res.json();
   return (
     <section>

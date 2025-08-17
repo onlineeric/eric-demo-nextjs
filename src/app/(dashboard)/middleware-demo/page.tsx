@@ -1,8 +1,9 @@
 import { headers } from 'next/headers';
 import Link from 'next/link';
+import RefreshButton from './RefreshButton';
 
-export default function MiddlewareDemoPage() {
-  const headersList = headers();
+export default async function MiddlewareDemoPage() {
+  const headersList = await headers();
   const customHeader = headersList.get('X-Custom-Header');
   const pathname = headersList.get('X-Pathname');
   const timestamp = headersList.get('X-Timestamp');
@@ -40,16 +41,7 @@ export default function MiddlewareDemoPage() {
           <Link href="/protected/secret" className="text-blue-600 underline">
             /protected/secret (requires auth cookie)
           </Link>
-          <a 
-            href="/middleware-demo" 
-            className="text-blue-600 underline"
-            onClick={() => {
-              // Refresh the page to see new timestamp
-              window.location.reload();
-            }}
-          >
-            Refresh to see new timestamp
-          </a>
+          <RefreshButton />
         </div>
       </div>
 

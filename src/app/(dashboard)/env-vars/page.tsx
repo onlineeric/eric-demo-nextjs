@@ -7,8 +7,8 @@ const nodeEnv = process.env.NODE_ENV;
 // Public environment variables (accessible on client)
 const publicApiUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
-export default function EnvVarsPage() {
-  const headersList = headers();
+export default async function EnvVarsPage() {
+  const headersList = await headers();
   const host = headersList.get('host');
 
   return (

@@ -23,7 +23,7 @@ const items = [
 export default function Sidebar() {
   const path = usePathname();
   return (
-    <aside className="hidden md:block w-64 border-r p-3">
+    <aside className="w-64 border-r p-3">
       <Listbox
         aria-label="Lessons"
         disallowEmptySelection
