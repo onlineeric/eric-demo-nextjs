@@ -50,6 +50,7 @@
 
   * `@heroui/react`
   * `@heroui/theme`
+  * `@tailwindcss/postcss` (required for Tailwind v4 with HeroUI)
 * **Framer Motion** if required by HeroUI.
 * Import alias: `@/*` (configured in `tsconfig.json`).
 * Keep server-only code (secrets, Node APIs) in **Server Components** / **Route Handlers**; DOM/interaction in **Client Components**.
@@ -72,7 +73,11 @@ nextjs-exercise/
   .gitignore
   README.md
   .env.local.example
+  public/
+    favicon.svg
+    demo-image.svg
   src/
+    middleware.ts
     app/
       layout.tsx
       globals.css
@@ -92,8 +97,22 @@ nextjs-exercise/
         actions/page.tsx
         actions/ui/ActionForm.tsx
         actions/actions.ts
+        dynamic/page.tsx
+        dynamic/[id]/page.tsx
+        dynamic/[...slug]/page.tsx
+        error-demo/page.tsx
+        error-demo/error.tsx
+        error-demo/not-found.tsx
+        error-demo/server-error/page.tsx
+        error-demo/client-error/page.tsx
+        middleware-demo/page.tsx
+        middleware-demo/RefreshButton.tsx
+        images/page.tsx
+        env-vars/page.tsx
       api/
         time/route.ts
+      global-error.tsx
+      protected/secret/page.tsx
     components/
       Topbar.tsx
       Sidebar.tsx
@@ -120,6 +139,7 @@ nextjs-exercise/
   "dependencies": {
     "@heroui/react": "latest",
     "@heroui/theme": "latest",
+    "@tailwindcss/postcss": "latest",
     "framer-motion": "latest",
     "next": "latest",
     "react": "latest",
@@ -173,7 +193,15 @@ nextjs-exercise/
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  experimental: {}
+  experimental: {},
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'picsum.photos',
+      },
+    ],
+  }
 };
 
 export default nextConfig;
@@ -184,7 +212,7 @@ export default nextConfig;
 ```js
 module.exports = {
   plugins: {
-    tailwindcss: {},
+    '@tailwindcss/postcss': {},
     autoprefixer: {}
   }
 };
@@ -193,7 +221,6 @@ module.exports = {
 ### `tailwind.config.ts`
 
 ```ts
-import type { Config } from "tailwindcss";
 import { nextui } from "@heroui/theme";
 
 export default {
@@ -203,7 +230,7 @@ export default {
   ],
   theme: { extend: {} },
   plugins: [nextui()]
-} satisfies Config;
+};
 ```
 
 ### `.eslintrc.json`
@@ -271,10 +298,10 @@ html, body { height: 100%; }
 ```tsx
 'use client';
 
-import { NextUIProvider } from "@heroui/react";
+import { HeroUIProvider } from "@heroui/react";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
-  return <NextUIProvider>{children}</NextUIProvider>;
+  return <HeroUIProvider>{children}</HeroUIProvider>;
 }
 ```
 
@@ -286,7 +313,10 @@ import Providers from "./providers";
 
 export const metadata = {
   title: "Next.js Exercise",
-  description: "Learn Next.js by pages (HeroUI + Tailwind)"
+  description: "Learn Next.js by pages (HeroUI + Tailwind)",
+  icons: {
+    icon: "/favicon.svg",
+  }
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -308,15 +338,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 ```tsx
 'use client';
-import { Navbar } from "@heroui/react";
+import { Navbar, NavbarBrand, NavbarContent } from "@heroui/react";
 
 export default function Topbar() {
   return (
     <Navbar maxWidth="full" className="border-b">
-      <Navbar.Brand className="font-semibold">Next.js Exercise</Navbar.Brand>
-      <Navbar.Content justify="end" className="text-sm opacity-70">
+      <NavbarBrand className="font-semibold">Next.js Exercise</NavbarBrand>
+      <NavbarContent justify="end" className="text-sm opacity-70">
         SPA → Next.js learning path
-      </Navbar.Content>
+      </NavbarContent>
     </Navbar>
   );
 }
@@ -339,13 +369,18 @@ const items = [
   { href: "/navigation", label: "Client-side Navigation" },
   { href: "/rsc", label: "RSC (Server vs Client)" },
   { href: "/api-demo", label: "Route Handlers (API)" },
-  { href: "/actions", label: "Server Actions" }
+  { href: "/actions", label: "Server Actions" },
+  { href: "/dynamic", label: "Dynamic Routes" },
+  { href: "/error-demo", label: "Error Handling" },
+  { href: "/middleware-demo", label: "Middleware" },
+  { href: "/images", label: "Image Optimization" },
+  { href: "/env-vars", label: "Environment Variables" }
 ];
 
 export default function Sidebar() {
   const path = usePathname();
   return (
-    <aside className="hidden md:block w-64 border-r p-3">
+    <aside className="w-64 border-r p-3">
       <Listbox
         aria-label="Lessons"
         disallowEmptySelection
@@ -376,8 +411,8 @@ import Sidebar from "@/components/Sidebar";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid grid-rows-[auto_1fr] md:grid-rows-[auto_1fr] md:grid-cols-[16rem_1fr] min-h-dvh">
-      <div className="md:col-span-2">
+    <div className="grid grid-rows-[auto_1fr] grid-cols-[16rem_1fr] min-h-dvh">
+      <div className="col-span-2">
         <Topbar />
       </div>
       <Sidebar />
@@ -439,9 +474,15 @@ export default function CSRPage() {
 // Force server render on every request (no caching)
 export const dynamic = "force-dynamic";
 
+import { headers } from 'next/headers';
+
 export default async function SSRPage() {
-  const base = process.env.NEXT_PUBLIC_BASE_URL ?? "";
-  const res = await fetch(`${base}/api/time`, { cache: "no-store" });
+  const headersList = await headers();
+  const host = headersList.get('host') || 'localhost:3000';
+  const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? `${protocol}://${host}`;
+  
+  const res = await fetch(`${baseUrl}/api/time`, { cache: "no-store" });
   const data = await res.json();
   return (
     <section>
@@ -576,9 +617,15 @@ export async function GET() {
 ### API Demo Page — `src/app/(dashboard)/api-demo/page.tsx`
 
 ```tsx
+import { headers } from 'next/headers';
+
 export default async function APIDemoPage() {
-  const base = process.env.NEXT_PUBLIC_BASE_URL ?? "";
-  const res = await fetch(`${base}/api/time`, { cache: "no-store" });
+  const headersList = await headers();
+  const host = headersList.get('host') || 'localhost:3000';
+  const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? `${protocol}://${host}`;
+  
+  const res = await fetch(`${baseUrl}/api/time`, { cache: "no-store" });
   const data = await res.json();
   return (
     <section>
