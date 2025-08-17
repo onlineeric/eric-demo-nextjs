@@ -17,7 +17,8 @@ const items = [
   { href: "/error-demo", label: "Error Handling" },
   { href: "/middleware-demo", label: "Middleware" },
   { href: "/images", label: "Image Optimization" },
-  { href: "/env-vars", label: "Environment Variables" }
+  { href: "/env-vars", label: "Environment Variables" },
+  { href: "/dark-mode", label: "🌙 Dark Mode Demo" }
 ];
 
 export default function Sidebar() {

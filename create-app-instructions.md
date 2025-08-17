@@ -45,7 +45,7 @@
 ## Tech Stack & Conventions
 
 * **Next.js** (App Router, `src/` directory, TypeScript).
-* **Tailwind CSS** configured with **HeroUI (NextUI)** plugin.
+* **Tailwind CSS v4** configured with **HeroUI (NextUI)** using CSS-first approach.
 * **HeroUI** packages:
 
   * `@heroui/react`
@@ -55,6 +55,14 @@
 * Import alias: `@/*` (configured in `tsconfig.json`).
 * Keep server-only code (secrets, Node APIs) in **Server Components** / **Route Handlers**; DOM/interaction in **Client Components**.
 * Use **English** for all code and comments.
+
+### Important: Tailwind CSS v4 Configuration Notes
+
+* **CSS-first configuration**: Uses `@import 'tailwindcss'` instead of `@tailwind` directives
+* **HeroUI theme loading**: Uses `@source` directive to load HeroUI theme from node_modules
+* **Config reference**: Uses `@config` directive to reference optional tailwind.config.ts
+* **Dark mode**: Custom variant defined with `@custom-variant dark (&:is(.dark *))`
+* **PostCSS**: Uses `@tailwindcss/postcss` plugin instead of direct `tailwindcss` plugin
 
 ---
 
@@ -218,7 +226,7 @@ module.exports = {
 };
 ```
 
-### `tailwind.config.ts`
+### `tailwind.config.ts` (Optional - for backward compatibility)
 
 ```ts
 import { nextui } from "@heroui/theme";
@@ -285,9 +293,11 @@ CSR, SSR, SSG, ISR, client-side navigation, RSC, Route Handlers (API), Server Ac
 ### `src/app/globals.css`
 
 ```css
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@source '../node_modules/@heroui/theme/dist';
+@config './tailwind.config.ts';
+
+@custom-variant dark (&:is(.dark *));
 
 /* Minimal global tweaks */
 html, body { height: 100%; }
@@ -748,3 +758,6 @@ All lesson pages live under `/src/app/(dashboard)/` so they share the Topbar + S
 * Generate all files with the exact contents above (adjust imports if your scaffolder requires different file extensions).
 * If the environment requires it, include `NEXT_PUBLIC_BASE_URL=http://localhost:3000` in `.env.local` during local run.
 * Keep the code idiomatic and minimal—this is a teaching/reference repo.
+* **CRITICAL**: Ensure HeroUI v2.8+ is installed (supports Tailwind CSS v4)
+* **CSS Configuration**: The `globals.css` must use Tailwind v4 syntax with `@import`, `@source`, and `@config` directives
+* **Testing**: Verify HeroUI components render with proper styling - should not appear as unstyled HTML

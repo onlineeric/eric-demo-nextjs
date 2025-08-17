@@ -1,6 +1,7 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@source '../../node_modules/@heroui/theme/dist';
+
+@custom-variant dark (&:is(.dark *));
 
 /* Minimal global tweaks */
 html, body { height: 100%; }
