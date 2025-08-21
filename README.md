@@ -6,7 +6,14 @@ Dynamic Routes, Error Handling, Middleware, Image Optimization, and Environment 
 
 ## Setup
 
-1. `cp .env.local.example .env.local` (optional - for environment variables demo)
+Prerequisite: Node.js 18+ (20+ recommended)
+
+1. Create `.env.local` (optional - for environment variables demo) with:
+
+```
+SECRET_KEY=super-secret
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
+```
 2. `npm install`
 3. `npm run dev`
 4. Open `http://localhost:3000`
@@ -19,6 +26,7 @@ Dynamic Routes, Error Handling, Middleware, Image Optimization, and Environment 
 - `npm run typecheck` - TypeScript type checking
 
 ## What to Try
+This app is for developers familiar with React SPA who want to learn Next.js.
 
 ### Core Rendering Patterns
 - `/csr` - Client-side data fetching (classic SPA behavior)
@@ -42,6 +50,8 @@ Dynamic Routes, Error Handling, Middleware, Image Optimization, and Environment 
 - `/middleware-demo` - Middleware for request/response modification
 - `/images` - Image optimization with next/image component
 - `/env-vars` - Environment variables (server-only vs public)
+- `/dark-mode` - Dark mode and theming (HeroUI + next-themes)
+- `/ui-components` - UI components demo built with HeroUI
 
 ### Error Testing
 - `/error-demo/server-error` - Trigger server error (demonstrates error.tsx)
@@ -51,6 +61,9 @@ Dynamic Routes, Error Handling, Middleware, Image Optimization, and Environment 
 ### Middleware Examples
 - `/old-path` - Redirects to middleware demo page
 - `/protected/secret` - Requires auth cookie (redirects if missing)
+
+Note: To access `/protected/secret`, set a cookie in your browser console:
+`document.cookie = "auth-token=demo; path=/";`
 
 ## Key Learning Points
 
@@ -95,25 +108,35 @@ Compare how the same content is loaded differently:
 
 ```
 src/
-├── middleware.ts                 # Request/response middleware
+├── middleware.ts                     # Request/response middleware
 ├── app/
-│   ├── layout.tsx               # Root layout
-│   ├── global-error.tsx         # Global error boundary
-│   ├── (dashboard)/             # Route group (doesn't affect URL)
-│   │   ├── layout.tsx          # Shared dashboard layout
-│   │   ├── page.tsx            # Home page
-│   │   ├── [concept]/page.tsx  # Individual concept pages
-│   │   ├── dynamic/
-│   │   │   ├── [id]/page.tsx   # Single param route
-│   │   │   └── [...slug]/page.tsx # Catch-all route
-│   │   └── error-demo/
-│   │       ├── error.tsx       # Error boundary
-│   │       └── not-found.tsx   # 404 page
-│   └── api/
-│       └── time/route.ts       # API route handler
+│   ├── layout.tsx                   # Root layout
+│   ├── global-error.tsx             # Global error boundary
+│   ├── providers.tsx                # Providers (theme, etc.)
+│   ├── api/
+│   │   └── time/route.ts           # API route handler
+│   ├── protected/
+│   │   └── secret/page.tsx         # Protected page (middleware-gated)
+│   └── (dashboard)/                # Route group (doesn't affect URL)
+│       ├── layout.tsx              # Shared dashboard layout
+│       ├── page.tsx                # Home page
+│       ├── actions/
+│       ├── api-demo/
+│       ├── csr/
+│       ├── dark-mode/
+│       ├── dynamic/
+│       ├── env-vars/
+│       ├── error-demo/
+│       ├── images/
+│       ├── isr/
+│       ├── navigation/
+│       ├── rsc/
+│       ├── ssg/
+│       ├── ssr/
+│       └── ui-components/
 └── components/
-    ├── Topbar.tsx              # Navigation header
-    └── Sidebar.tsx             # Navigation sidebar
+    ├── Topbar.tsx                  # Navigation header
+    └── Sidebar.tsx                 # Navigation sidebar
 ```
 
 ## Development Tips

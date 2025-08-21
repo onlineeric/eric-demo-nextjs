@@ -14,6 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Environment Setup
 - Copy `.env.local.example` to `.env.local` for environment variables demo
 - Required for SSR page to work properly with API calls
+- Uses HeroUI configuration in `hero.ts` (Tailwind config is in this file)
 
 ## Project Architecture
 
@@ -47,6 +48,8 @@ Each page demonstrates a specific Next.js concept:
 - `/images` - Image optimization with next/image
 - `/env-vars` - Environment variables (server vs public)
 - `/navigation` - Client-side navigation without reload
+- `/dark-mode` - Dark mode implementation with next-themes + HeroUI
+- `/ui-components` - HeroUI component showcase
 
 #### Architecture Patterns
 
@@ -77,8 +80,8 @@ Each page demonstrates a specific Next.js concept:
 
 #### Configuration Files
 - **next.config.ts**: Image optimization config for external domains (picsum.photos)
-- **tailwind.config.ts**: HeroUI theme integration
-- **tsconfig.json**: TypeScript config with `@/*` path alias
+- **hero.ts**: HeroUI theme configuration (acts as Tailwind config)
+- **tsconfig.json**: TypeScript config with `@/*` path alias, strict mode enabled
 - **postcss.config.js**: Tailwind v4 + autoprefixer setup
 
 ## Development Guidelines
